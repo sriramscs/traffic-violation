@@ -1,0 +1,16 @@
+# YOLOv11 Multi-Violation Dataset Configuration
+path: dataset
+train: train/images
+val: valid/images
+test: valid/images
+
+nc: 7
+names: [
+  'helmet', 
+  'no_helmet', 
+  'motorcycle', 
+  'person', 
+  'license_plate', 
+  'seatbelt', 
+  'no_seatbelt'
+]

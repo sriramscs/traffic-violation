@@ -1,0 +1,22 @@
+# Core Computer Vision & Deep Learning
+ultralytics>=8.3.0
+torch>=2.2.0
+torchvision>=0.17.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+scipy>=1.10.0
+matplotlib>=3.7.0
+pillow>=10.0.0
+
+# Tracking & Multi-Object Processing
+lap>=0.5.12
+
+# License Plate OCR (Dual-Engine: PaddleOCR with EasyOCR fallback)
+easyocr>=1.7.0
+paddleocr>=2.7.0; sys_platform == 'linux'
+paddlepaddle>=2.5.0; sys_platform == 'linux'
+
+# Web Analytics Dashboard
+flask>=3.0.0
+jinja2>=3.1.0
+werkzeug>=3.0.0

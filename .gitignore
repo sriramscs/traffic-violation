@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Caches and temporary files
+*.cache
+*.part
+.cache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE and Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Video and Media files (large binary assets)
+# Excluded to avoid GitHub file size limitations (>100MB limit)
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+
+# Model Training Runs & Logs
+runs/
+*.log
+
+# Generated Runtime Evidence (Keep folder structure via .gitkeep)
+results/evidence/*
+!results/evidence/.gitkeep
+results/benchmark_tmp/
+results/test_ev/
+
+# OS-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

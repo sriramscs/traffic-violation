@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Explainable Traffic Violation Detection System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="brand-logo">
+                <span class="logo-icon">🛡️</span>
+                <div>
+                    <h1 class="brand-title">AURA-TRAFFIC AI</h1>
+                    <p class="brand-subtitle">Explainable Multi-Violation Detection & Tracking System</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-badges">
+            <div class="status-chip chip-online">
+                <span class="pulse-dot"></span> System Live
+            </div>
+            <button id="gpu-toggle-btn" class="toggle-btn active" onclick="toggleGPU()" title="Click to toggle between GPU and CPU processing mode">
+                <span class="toggle-icon">⚡</span>
+                <span id="gpu-btn-label">GPU: RTX 3050 (ON)</span>
+            </button>
+            <div class="status-chip chip-camera" id="chip-camera">
+                <span id="camera-badge-label">📹 {{ state.camera_id }}</span>
+            </div>
+            <button id="vit-toggle-btn" class="toggle-btn active" onclick="toggleViT()">
+                <span class="toggle-icon">🧠</span>
+                <span id="vit-btn-label">ViT Enhancement: ON</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- KPI Metrics Ribbon -->
+        <section class="kpi-grid">
+            <div class="kpi-card total-card">
+                <div class="kpi-icon-box">🚨</div>
+                <div class="kpi-content">
+                    <span class="kpi-title">Total Violations</span>
+                    <h2 class="kpi-value" id="kpi-total">0</h2>
+                </div>
+            </div>
+            <div class="kpi-card helmet-card">
+                <div class="kpi-icon-box">🪖</div>
+                <div class="kpi-content">
+                    <span class="kpi-title">Helmet Violations</span>
+                    <h2 class="kpi-value" id="kpi-helmet">0</h2>
+                </div>
+            </div>
+            <div class="kpi-card triple-card">
+                <div class="kpi-icon-box">🏍️</div>
+                <div class="kpi-content">
+                    <span class="kpi-title">Triple Riding</span>
+                    <h2 class="kpi-value" id="kpi-triple">0</h2>
+                </div>
+            </div>
+            <div class="kpi-card seatbelt-card">
+                <div class="kpi-icon-box">🚗</div>
+                <div class="kpi-content">
+                    <span class="kpi-title">Seatbelt Violations</span>
+                    <h2 class="kpi-value" id="kpi-seatbelt">0</h2>
+                </div>
+            </div>
+            <div class="kpi-card phone-card">
+                <div class="kpi-icon-box">📱</div>
+                <div class="kpi-content">
+                    <span class="kpi-title">Mobile Usage</span>
+                    <h2 class="kpi-value" id="kpi-phone">0</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('live-monitor')">🎥 Live CCTV Monitor</button>
+            <button class="tab-btn" onclick="switchTab('evidence-gallery')">🔍 Evidence & Grad-CAM++ Dossiers</button>
+            <button class="tab-btn" onclick="switchTab('analytics-view')">📊 Traffic Analytics</button>
+            <button class="tab-btn" onclick="switchTab('benchmark-view')">🏆 IEEE Research Benchmark</button>
+        </nav>
+
+        <!-- Tab 1: Live Monitor -->
+        <section id="tab-live-monitor" class="tab-content active">
+            <div class="monitor-grid">
+                <!-- Video Stream Player -->
+                <div class="video-panel glass-card">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <span class="live-indicator">REC ●</span>
+                            <span class="stream-title">Live AI Detection & ByteTrack Stream</span>
+                        </div>
+                        <div class="stream-controls">
+                            <select id="video-source-select" class="custom-select" onchange="changeVideoSource(this.value)">
+                                <option value="input/sample3.mp4" selected>📹 CCTV 1: Urban Intersection 4K (sample3.mp4)</option>
+                                <option value="input/sample1.mp4">📹 CCTV 2: Highway Flow (sample1.mp4)</option>
+                                <option value="input/sample.mp4">📹 CCTV 3: Roadside Traffic (sample.mp4)</option>
+                                <option value="0">📷 Webcam 0 (Live Laptop Camera)</option>
+                                <option value="1">📷 Webcam 1 (External USB Camera)</option>
+                                <option value="custom_url">🌐 Enter Custom Video / RTSP Stream...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="video-wrapper">
+                        <img id="live-stream-img" src="/video_feed" alt="Real-time Traffic Video Feed">
+                    </div>
+                    <div class="video-footer">
+                        <div class="footer-metric">
+                            <span class="metric-dot dot-green"></span>
+                            <span>ByteTrack Active (Kalman + Hungarian Matching)</span>
+                        </div>
+                        <div class="footer-metric">
+                            <span class="metric-dot dot-cyan"></span>
+                            <span>OCR: PaddleOCR / EasyOCR Dual Engine</span>
+                        </div>
+                        <div class="footer-metric">
+                            <span class="metric-dot dot-magenta"></span>
+                            <span>XAI: Grad-CAM++ Gradient Heatmaps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Alert Stream / Activity Feed -->
+                <div class="feed-panel glass-card">
+                    <div class="panel-header">
+                        <span class="stream-title">Live Violation Log</span>
+                        <span class="badge-pill" id="badge-active-tracks">0 Active Tracks</span>
+                    </div>
+                    <div class="feed-container" id="feed-container">
+                        <div class="feed-empty-state">
+                            <span class="empty-icon">⏳</span>
+                            <p>Monitoring traffic stream for violations...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Evidence Gallery -->
+        <section id="tab-evidence-gallery" class="tab-content">
+            <div class="gallery-header">
+                <div>
+                    <h2>Explainable Evidence Dossiers</h2>
+                    <p class="section-desc">Auditable violation records featuring composite original crops, license plate text, and Grad-CAM++ visual heatmaps.</p>
+                </div>
+                <button class="btn-primary" onclick="loadViolations()">🔄 Refresh Records</button>
+            </div>
+            <div class="evidence-grid" id="evidence-gallery-grid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Tab 3: Analytics View -->
+        <section id="tab-analytics-view" class="tab-content">
+            <div class="analytics-grid">
+                <div class="chart-card glass-card">
+                    <h3>Violation Breakdown by Category</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="violationPieChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass-card">
+                    <h3>Recent Detection Timeline</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="violationBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: IEEE Benchmark View -->
+        <section id="tab-benchmark-view" class="tab-content">
+            <div class="benchmark-container glass-card">
+                <div class="benchmark-header">
+                    <h2>IEEE Research Contribution & Ablation Study</h2>
+                    <p class="section-desc">
+                        Experimental comparison validating the performance gain of our proposed framework
+                        (YOLOv11 + Vision Transformer + ByteTrack + Grad-CAM++) against baseline YOLOv11.
+                    </p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="benchmark-table">
+                        <thead>
+                            <tr>
+                                <th>Framework Architecture</th>
+                                <th>ViT Feature Refinement</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>mAP@0.5</th>
+                                <th>Inference FPS</th>
+                                <th>Avg Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="benchmark-tbody">
+                            <!-- Populated via API -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="research-highlights">
+                    <div class="highlight-item">
+                        <h4>🎯 Why Vision Transformer (ViT)?</h4>
+                        <p>Global patch self-attention allows the system to analyze subtle features (e.g. seatbelt sash contrast across dark clothing or helmet curvature under heavy glare) where local CNN kernels fail.</p>
+                    </div>
+                    <div class="highlight-item">
+                        <h4>🔄 Why ByteTrack?</h4>
+                        <p>Temporal Kalman filtering and low-score detection association prevent duplicate penalty ticketing and eliminate false alarms caused by temporary camera occlusion.</p>
+                    </div>
+                    <div class="highlight-item">
+                        <h4>🔍 Why Grad-CAM++?</h4>
+                        <p>Provides mathematical accountability and Explainable AI (XAI) verification, highlighting the exact image region responsible for flagging the citation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Detailed Evidence Inspection -->
+    <div id="evidence-modal" class="modal-backdrop" onclick="closeModal(event)">
+        <div class="modal-content glass-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">Evidence Dossier Record</h3>
+                <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modal-img" src="" alt="Evidence Dossier Preview">
+                </div>
+                <div class="modal-meta-grid" id="modal-meta">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="modal-download-btn" href="#" download class="btn-primary">⬇️ Download Evidence Image</a>
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
